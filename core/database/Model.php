@@ -16,27 +16,56 @@ abstract class Model extends Connection
         $this->query->execute($exec);
     }
     
-    public function selectAll($table)
+    /**
+     * Retorna todos as colunas de uma tabela
+     *
+     * @param $table
+     * @return array|false
+     */
+    public function all($table): array
     {
         $statement = $this->prepare("select * from {$table}");
         $statement->execute();
         
         return $statement->fetchAll(PDO::FETCH_CLASS);
-        
-    }
-
-    public function select($campos,$tabela,$prep,$exec)
-    {
-        $this -> prepExec('SELECT '. $campos .' FROM '. $tabela .' '. $prep . ' ', $exec);
-        return $this -> query;
-    }
-
-    public function update($tabela,$prep,$exec)
-    {
-        $this -> prepExec('UPDATE '.$tabela.' SET '. $prep .' ', $exec);
-        return $this -> query;
     }
     
+    /**
+     * Retorna campos de uma tabela
+     *
+     * @param $campos
+     * @param $tabela
+     * @param $prep
+     * @param $exec
+     * @return array|false
+     */
+    public function select($campos, $tabela, $prep, $exec): array
+    {
+        $this->prepExec('SELECT '. $campos .' FROM '. $tabela .' '. $prep . ' ', $exec);
+        return $this->query->fetchAll(PDO::FETCH_CLASS);
+    }
+    
+    /**
+     * Faz o update e dados em uma tabela
+     *
+     * @param $tabela
+     * @param $prep
+     * @param $exec
+     * @return PDOStatement
+     */
+    public function update($tabela, $prep, $exec): PDOStatement
+    {
+        $this->prepExec('UPDATE '.$tabela.' SET '. $prep .' ', $exec);
+        return $this->query;
+    }
+    
+    /**
+     * Adiciona novos dados em uma tabela
+     *
+     * @param $table
+     * @param $parameters
+     * @return bool|void
+     */
     public function insert($table, $parameters) {
         $sql = sprintf(
             'insert into %s (%s) values (%s)',
@@ -53,17 +82,24 @@ abstract class Model extends Connection
         }
         return true;
     }
-
-    public function delete($tabela,$prep,$exec)
+    
+    /**
+     * Remove dados de uma tabela
+     *
+     * @param $tabela
+     * @param $prep
+     * @param $exec
+     * @return PDOStatement
+     */
+    public function delete($tabela, $prep, $exec): PDOStatement
     {
         $this -> prepExec('DELETE FROM '.$tabela.' '. $prep .' ', $exec);
         return $this -> query;
     }
     
-    public function selectJoin($campos,$tabela,$prep,$exec)
-    {
-        $this -> prepExec('SELECT '. $campos .' FROM '. $tabela .' '. $prep .'', $exec);
-        return $this -> query;
-        //return $this -> query retornará o resultado da ação em um var_dump no objeto extanciado
-    }
+//    public function selectJoin($campos,$tabela,$prep,$exec)
+//    {
+//        $this -> prepExec('SELECT '. $campos .' FROM '. $tabela .' '. $prep .'', $exec);
+//        return $this->query;
+//    }
 }
